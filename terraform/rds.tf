@@ -8,8 +8,6 @@
 #
 
 
-
-
 resource "aws_db_subnet_group" "main" {
   name       = "aurora-db-subnet-group"
   subnet_ids = [aws_subnet.private_db_subnet.id]
