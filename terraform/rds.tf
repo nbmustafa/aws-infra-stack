@@ -28,8 +28,6 @@ resource "aws_rds_cluster_instance" "example" {
   identifier         = "aurora-instance-${count.index}"
   cluster_identifier = "aurora-cluster-demo"
   instance_class     = "db.t3.medium"
-  engine             = "aurora-mysql"
-  engine_version     = "5.7.mysql_aurora.2.07.1"
 
   tags = {
     Backup = "true"
