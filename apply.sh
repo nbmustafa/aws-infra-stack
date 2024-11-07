@@ -6,7 +6,7 @@ set -euo pipefail  # Enable strict error handling
 TERRAFORM_VERSION="1.5.0"
 S3_BUCKET="your-s3-bucket-name"
 S3_KEY="path/to/your/terraform.tfstate"
-REGION="your-aws-region"
+REGION="eu-central-1"
 TEMP_DIR="/tmp/terraform_install"
 
 # Function to check and install specific Terraform version
