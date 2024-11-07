@@ -50,20 +50,20 @@ resource "aws_lb_listener" "web_listener_https" {
   }
 }
 
-resource "aws_lb_listener_rule" "web_listener_rule" {
-  listener_arn = aws_lb_listener.web_listener_https.arn
-  priority     = 100
+# resource "aws_lb_listener_rule" "web_listener_rule" {
+#   listener_arn = aws_lb_listener.web_listener_https.arn
+#   priority     = 100
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.web_tg.arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.web_tg.arn
+#   }
 
-  condition {
-    field  = "path-pattern"
-    values = ["/*"]
-  }
-}
+#   condition {
+#     field  = "path-pattern"
+#     values = ["/*"]
+#   }
+# }
 
 output "alb_dns_name" {
   value = aws_lb.web_alb.dns_name
