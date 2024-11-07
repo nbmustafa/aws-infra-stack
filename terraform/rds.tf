@@ -54,32 +54,39 @@ locals {
 }
 
 ## Create db cluster and db instance
-resource "aws_rds_cluster" "aurora_cluster" {
+# Create RDS Cluster and Instances
+resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "aurora-cluster"
   engine                  = "aurora-mysql"
+  engine_version          = var.db_engine_version
   master_username         = local.db_username
   master_password         = local.db_password
-  db_subnet_group_name    = aws_db_subnet_group.main.name
+  database_name           = var.db_name
   vpc_security_group_ids  = [aws_security_group.aurora_sg.id]
+  db_subnet_group_name    = aws_db_subnet_group.main.name
+  skip_final_snapshot     = true
 
   tags = {
-    Name   = "AuroraCluster"
-    Backup = "true" // tag used for backup
+    Name        = "AuroraCluster"
+    Environment = "production"
+    Backup      = "true"
   }
 }
 
 resource "aws_rds_cluster_instance" "aurora_instances" {
-  count              = 2
-  identifier         = "aurora-instance-${count.index}"
-  cluster_identifier = aws_rds_cluster.aurora_cluster.id
-  instance_class     = "db.r5.large" # Adjust instance type as needed
-  db_subnet_group_name = aws_db_subnet_group.main.name
+  count                   = 2
+  identifier              = "aurora-instance-${count.index}"
+  cluster_identifier      = aws_rds_cluster.aurora.id
+  instance_class          = "db.r5.large"
+  engine                  = aws_rds_cluster.aurora.engine
+  engine_version          = aws_rds_cluster.aurora.engine_version
+  publicly_accessible     = false
 
   tags = {
-    Name = "AuroraInstance-${count.index}"
+    Name        = "AuroraInstance${count.index}"
+    Environment = "production"
   }
 }
-
 
 #### Create Backup Vault
 resource "aws_backup_vault" "example" {
