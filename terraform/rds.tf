@@ -17,28 +17,6 @@ resource "aws_db_subnet_group" "main" {
   }
 }
 
-resource "aws_security_group" "aurora_sg" {
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "AuroraSecurityGroup"
-  }
-}
-
 ## Retrive secrets from AWS secret managers:
 data "aws_secretsmanager_secret" "db_credentials" {
   name = "aurora-db-credentials"

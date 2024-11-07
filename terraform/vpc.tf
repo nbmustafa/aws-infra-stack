@@ -4,23 +4,93 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 }
 
-resource "aws_subnet" "public_subnet" {
+# Public Subnets
+resource "aws_subnet" "public_subnet_a" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = "10.0.1.0/26"
   map_public_ip_on_launch = true
   availability_zone = "eu-central-1a"
 }
 
-resource "aws_subnet" "private_compute_subnet" {
+resource "aws_subnet" "public_subnet_b" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  cidr_block = "10.0.1.64/26"
+  map_public_ip_on_launch = true
   availability_zone = "eu-central-1b"
 }
 
-resource "aws_subnet" "private_db_subnet" {
+resource "aws_subnet" "public_subnet_c" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.3.0/24"
+  cidr_block = "10.0.1.128/26"
+  map_public_ip_on_launch = true
   availability_zone = "eu-central-1c"
+}
+
+# Private Compute Subnets
+resource "aws_subnet" "private_compute_subnet_a" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.2.0/26"
+  availability_zone = "eu-central-1a"
+}
+
+resource "aws_subnet" "private_compute_subnet_b" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.2.64/26"
+  availability_zone = "eu-central-1b"
+}
+
+resource "aws_subnet" "private_compute_subnet_c" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.2.128/26"
+  availability_zone = "eu-central-1c"
+}
+
+# Private DB Subnets
+resource "aws_subnet" "private_db_subnet_a" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.3.0/26"
+  availability_zone = "eu-central-1a"
+}
+
+resource "aws_subnet" "private_db_subnet_b" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.3.64/26"
+  availability_zone = "eu-central-1b"
+}
+
+resource "aws_subnet" "private_db_subnet_c" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.3.128/26"
+  availability_zone = "eu-central-1c"
+}
+
+# IGW and Routing tables
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+}
+
+resource "aws_route_table_association" "public_subnet_association_a" {
+  subnet_id = aws_subnet.public_subnet_a.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_route_table_association" "public_subnet_association_b" {
+  subnet_id = aws_subnet.public_subnet_b.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_route_table_association" "public_subnet_association_c" {
+  subnet_id = aws_subnet.public_subnet_c.id
+  route_table_id = aws_route_table.public_route_table.id
 }
 
 ### Security Groups 
@@ -53,7 +123,11 @@ resource "aws_security_group" "private_compute_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.public_subnet.cidr_block]
+    cidr_blocks = [
+      aws_subnet.public_subnet_a.cidr_block,
+      aws_subnet.public_subnet_b.cidr_block,
+      aws_subnet.public_subnet_c.cidr_block
+    ]
   }
 
   egress {
@@ -68,43 +142,28 @@ resource "aws_security_group" "private_compute_sg" {
   }
 }
 
-# resource "aws_security_group" "private_db_sg" {
-#   vpc_id = aws_vpc.main.id
-
-#   ingress {
-#     from_port   = 3306
-#     to_port     = 3306
-#     protocol    = "tcp"
-#     cidr_blocks = [aws_subnet.private_compute_subnet.cidr_block]
-#   }
-
-#   egress {
-#     from_port = 0
-#     to_port   = 0
-#     protocol  = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   tags = {
-#     Name = "PrivateDBSG"
-#   }
-# }
-
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
-}
-
-resource "aws_route_table" "public_route_table" {
+resource "aws_security_group" "private_db_sg" {
   vpc_id = aws_vpc.main.id
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [
+      aws_subnet.private_compute_subnet_a.cidr_block,
+      aws_subnet.private_compute_subnet_b.cidr_block,
+      aws_subnet.private_compute_subnet_c.cidr_block
+    ]
   }
-}
 
-resource "aws_route_table_association" "public_subnet_association" {
-  subnet_id = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.public_route_table.id
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "PrivateDBSG"
+  }
 }
