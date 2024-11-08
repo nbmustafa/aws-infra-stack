@@ -1,9 +1,10 @@
 # Create ssl cert from acm for your hostname
 resource "aws_lb" "web_alb" {
-  name               = "${local.organisation}-web-alb"
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.web_alb_sg.id]
-  
+  name                             = "${local.organisation}-web-alb"
+  load_balancer_type               = "application"
+  security_groups                  = [aws_security_group.web_alb_sg.id]
+  enable_cross_zone_load_balancing = true
+
   # Include all three public subnets
   subnets = [
     aws_subnet.public_subnet_a.id,
@@ -18,13 +19,12 @@ resource "aws_lb" "web_alb" {
   }
 }
 
-
 resource "aws_lb_target_group" "web_tg" {
-  name     = "${local.organisation}-web-tg"
-  port     = 443
-  protocol = "HTTPS"
+  name        = "${local.organisation}-web-tg"
+  port        = 443
+  protocol    = "HTTPS"
   target_type = "ip"
-  vpc_id   = aws_vpc.main.id
+  vpc_id      = aws_vpc.main.id
 
   health_check {
     path                = "/"

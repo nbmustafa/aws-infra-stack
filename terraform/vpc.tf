@@ -1,66 +1,66 @@
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
   enable_dns_hostnames = true
 }
 
 # Public Subnets
 resource "aws_subnet" "public_subnet_a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/26"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/26"
   map_public_ip_on_launch = true
-  availability_zone = "${data.aws_region.current.name}a"
+  availability_zone       = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "public_subnet_b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.64/26"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.64/26"
   map_public_ip_on_launch = true
-  availability_zone = "${data.aws_region.current.name}b"
+  availability_zone       = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "public_subnet_c" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.128/26"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.128/26"
   map_public_ip_on_launch = true
-  availability_zone = "${data.aws_region.current.name}c"
+  availability_zone       = "${data.aws_region.current.name}c"
 }
 
 # Private Compute Subnets
 resource "aws_subnet" "private_compute_subnet_a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/26"
   availability_zone = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "private_compute_subnet_b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.64/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.64/26"
   availability_zone = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "private_compute_subnet_c" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.128/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.128/26"
   availability_zone = "${data.aws_region.current.name}c"
 }
 
 # Private DB Subnets
 resource "aws_subnet" "private_db_subnet_a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.3.0/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/26"
   availability_zone = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "private_db_subnet_b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.3.64/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.64/26"
   availability_zone = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "private_db_subnet_c" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.3.128/26"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.128/26"
   availability_zone = "${data.aws_region.current.name}c"
 }
 
@@ -79,17 +79,17 @@ resource "aws_route_table" "public_route_table" {
 }
 
 resource "aws_route_table_association" "public_subnet_association_a" {
-  subnet_id = aws_subnet.public_subnet_a.id
+  subnet_id      = aws_subnet.public_subnet_a.id
   route_table_id = aws_route_table.public_route_table.id
 }
 
 resource "aws_route_table_association" "public_subnet_association_b" {
-  subnet_id = aws_subnet.public_subnet_b.id
+  subnet_id      = aws_subnet.public_subnet_b.id
   route_table_id = aws_route_table.public_route_table.id
 }
 
 resource "aws_route_table_association" "public_subnet_association_c" {
-  subnet_id = aws_subnet.public_subnet_c.id
+  subnet_id      = aws_subnet.public_subnet_c.id
   route_table_id = aws_route_table.public_route_table.id
 }
 
@@ -98,16 +98,16 @@ resource "aws_security_group" "web_alb_sg" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] // change it to cloudflare IP address/ranges
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -120,9 +120,9 @@ resource "aws_security_group" "private_compute_sg" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
     cidr_blocks = [
       aws_subnet.public_subnet_a.cidr_block,
       aws_subnet.public_subnet_b.cidr_block,
@@ -131,9 +131,9 @@ resource "aws_security_group" "private_compute_sg" {
   }
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
     cidr_blocks = [
       aws_subnet.private_compute_subnet_a.cidr_block,
       aws_subnet.private_compute_subnet_b.cidr_block,
@@ -143,9 +143,9 @@ resource "aws_security_group" "private_compute_sg" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -158,9 +158,9 @@ resource "aws_security_group" "private_db_sg" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
+    from_port = 3306
+    to_port   = 3306
+    protocol  = "tcp"
     cidr_blocks = [
       aws_subnet.private_compute_subnet_a.cidr_block,
       aws_subnet.private_compute_subnet_b.cidr_block,
@@ -169,9 +169,9 @@ resource "aws_security_group" "private_db_sg" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -206,17 +206,17 @@ resource "aws_network_acl" "public" {
 }
 
 resource "aws_network_acl_association" "public_a" {
-  subnet_id     = aws_subnet.public_subnet_a.id
+  subnet_id      = aws_subnet.public_subnet_a.id
   network_acl_id = aws_network_acl.public.id
 }
 
 resource "aws_network_acl_association" "public_b" {
-  subnet_id     = aws_subnet.public_subnet_b.id
+  subnet_id      = aws_subnet.public_subnet_b.id
   network_acl_id = aws_network_acl.public.id
 }
 
 resource "aws_network_acl_association" "public_c" {
-  subnet_id     = aws_subnet.public_subnet_c.id
+  subnet_id      = aws_subnet.public_subnet_c.id
   network_acl_id = aws_network_acl.public.id
 }
 
@@ -263,17 +263,17 @@ resource "aws_network_acl" "private_compute" {
 }
 
 resource "aws_network_acl_association" "private_compute_a" {
-  subnet_id     = aws_subnet.private_compute_subnet_a.id
+  subnet_id      = aws_subnet.private_compute_subnet_a.id
   network_acl_id = aws_network_acl.private_compute.id
 }
 
 resource "aws_network_acl_association" "private_compute_b" {
-  subnet_id     = aws_subnet.private_compute_subnet_b.id
+  subnet_id      = aws_subnet.private_compute_subnet_b.id
   network_acl_id = aws_network_acl.private_compute.id
 }
 
 resource "aws_network_acl_association" "private_compute_c" {
-  subnet_id     = aws_subnet.private_compute_subnet_c.id
+  subnet_id      = aws_subnet.private_compute_subnet_c.id
   network_acl_id = aws_network_acl.private_compute.id
 }
 
