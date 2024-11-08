@@ -23,7 +23,7 @@ resource "aws_subnet" "public_subnet_c" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.128/26"
   map_public_ip_on_launch = true
-  availability_zone = "eu-central-1c"
+  availability_zone = "${data.aws_region.current.name}c"
 }
 
 # Private Compute Subnets
