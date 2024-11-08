@@ -1,3 +1,10 @@
+# ### Explanation
+# - **Versioning**: Enables versioning to keep multiple versions of an object in the same bucket.
+# - **Server-Side Encryption**: Encrypts the data at rest using AES-256.
+# - **Logging**: Stores access logs in a separate bucket.
+# - **Lifecycle Rules**: Manages the lifecycle of objects to transition to cheaper storage and eventually delete them.
+# - **Bucket Policy**: Denies requests that are not using secure transport (HTTPS).
+
 # Creating S3 bucket
 resource "aws_s3_bucket" "secure_bucket" {
   bucket = "my-bucket-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
