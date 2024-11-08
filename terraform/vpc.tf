@@ -101,7 +101,7 @@ resource "aws_security_group" "web_alb_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] // change it to cloudflare IP address/ranges
+    cidr_blocks = local.cloudflare_ip_range
   }
 
   egress {
@@ -123,23 +123,28 @@ resource "aws_security_group" "private_compute_sg" {
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
-    cidr_blocks = [
-      aws_subnet.public_subnet_a.cidr_block,
-      aws_subnet.public_subnet_b.cidr_block,
-      aws_subnet.public_subnet_c.cidr_block
-    ]
+    cidr_blocks = concat(
+      [
+        aws_subnet.public_subnet_a.cidr_block,
+        aws_subnet.public_subnet_b.cidr_block,
+        aws_subnet.public_subnet_c.cidr_block
+      ],
+      local.corporate_ip_range
+    )
   }
 
   ingress {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
-    cidr_blocks = [
-      aws_subnet.private_compute_subnet_a.cidr_block,
-      aws_subnet.private_compute_subnet_b.cidr_block,
-      aws_subnet.private_compute_subnet_c.cidr_block,
-      "10.0.0.0" //corporate network public IP address or VPN subnet range for ssh connectirivty
-    ]
+    cidr_blocks = concat(
+      [
+        aws_subnet.private_compute_subnet_a.cidr_block,
+        aws_subnet.private_compute_subnet_b.cidr_block,
+        aws_subnet.private_compute_subnet_c.cidr_block
+      ],
+      local.corporate_ip_range
+    )
   }
 
   egress {
@@ -189,7 +194,7 @@ resource "aws_network_acl" "public" {
     protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
-    cidr_block = "0.0.0.0/0" //Change this to cloudflare IP address/range
+    cidr_block = local.cloudflare_ip_range
     from_port  = 443
     to_port    = 443
   }
@@ -247,6 +252,15 @@ resource "aws_network_acl" "private_compute" {
     rule_no    = 100
     action     = "allow"
     cidr_block = aws_subnet.public_subnet_c.cidr_block
+    from_port  = 443
+    to_port    = 443
+  }
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = local.corporate_ip_range
     from_port  = 443
     to_port    = 443
   }
