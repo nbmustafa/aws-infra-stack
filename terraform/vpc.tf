@@ -197,19 +197,19 @@ resource "aws_network_acl" "public" {
   ]
 }
 
-# # Create NACL ingress rules dynamically for corporate IP ranges
-# resource "aws_network_acl_rule" "ingress_corporate" {
-#   for_each = { for i, cidr in local.cloudflare_ip_range : i => cidr }
+# Create NACL ingress rules dynamically for corporate IP ranges
+resource "aws_network_acl_rule" "ingress_corporate" {
+  for_each = { for i, cidr in local.cloudflare_ip_range : i => cidr }
 
-#   network_acl_id = aws_network_acl.public.id
-#   rule_number    = 100 + each.key.to_number() * 10
-#   protocol       = "tcp"
-#   rule_action    = "allow"
-#   egress         = false
-#   cidr_block     = each.value
-#   from_port      = 443
-#   to_port        = 443
-# }
+  network_acl_id = aws_network_acl.public.id
+  rule_number    = 100 + each.key * 10
+  protocol       = "tcp"
+  rule_action    = "allow"
+  egress         = false
+  cidr_block     = each.value
+  from_port      = 443
+  to_port        = 443
+}
 
 # Define egress rules if needed
 resource "aws_network_acl_rule" "egress_all" {
@@ -240,7 +240,7 @@ resource "aws_network_acl_rule" "ssh_ingress_from_corporate" {
   for_each = { for i, cidr in local.corporate_ip_range : i => cidr }
 
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 100 + each.key.to_number() * 10
+  rule_number    = 100 + each.key * 10
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -253,7 +253,7 @@ resource "aws_network_acl_rule" "https_from_ingress_corporate" {
   for_each = { for i, cidr in local.corporate_ip_range : i => cidr }
 
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 200 + each.key.to_number() * 10
+  rule_number    = 200 + each.key * 10
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
