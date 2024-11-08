@@ -167,3 +167,64 @@ resource "aws_security_group" "private_db_sg" {
     Name = "PrivateDBSG"
   }
 }
+
+# Applying NACLs on all subnets:
+
+
+
+resource "aws_network_acl" "private_db" {
+  vpc_id = aws_vpc.main.id
+
+  # Allow inbound MySQL traffic from private compute subnets
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = aws_subnet.private_compute_subnet_a.cidr_block
+    from_port  = 3306
+    to_port    = 3306
+  }
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = aws_subnet.private_compute_subnet_b.cidr_block
+    from_port  = 3306
+    to_port    = 3306
+  }
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = aws_subnet.private_compute_subnet_c.cidr_block
+    from_port  = 3306
+    to_port    = 3306
+  }
+
+  # Allow outbound traffic to anywhere
+  egress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+}
+
+resource "aws_network_acl_association" "private_db_a" {
+  subnet_id      = aws_subnet.private_db_subnet_a.id
+  network_acl_id = aws_network_acl.private_db.id
+}
+
+resource "aws_network_acl_association" "private_db_b" {
+  subnet_id      = aws_subnet.private_db_subnet_b.id
+  network_acl_id = aws_network_acl.private_db.id
+}
+
+resource "aws_network_acl_association" "private_db_c" {
+  subnet_id      = aws_subnet.private_db_subnet_c.id
+  network_acl_id = aws_network_acl.private_db.id
+}
