@@ -120,8 +120,8 @@ resource "aws_security_group" "private_compute_sg" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [
       aws_subnet.public_subnet_a.cidr_block,
@@ -169,8 +169,101 @@ resource "aws_security_group" "private_db_sg" {
 }
 
 # Applying NACLs on all subnets:
+resource "aws_network_acl" "public" {
+  vpc_id = aws_vpc.main.id
 
+  # Allow inbound HTTPS traffic
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0" //Change this to cloudflare IP address/range
+    from_port  = 443
+    to_port    = 443
+  }
 
+  # Allow outbound traffic to anywhere
+  egress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+}
+
+resource "aws_network_acl_association" "public_a" {
+  subnet_id     = aws_subnet.public_subnet_a.id
+  network_acl_id = aws_network_acl.public.id
+}
+
+resource "aws_network_acl_association" "public_b" {
+  subnet_id     = aws_subnet.public_subnet_b.id
+  network_acl_id = aws_network_acl.public.id
+}
+
+resource "aws_network_acl_association" "public_c" {
+  subnet_id     = aws_subnet.public_subnet_c.id
+  network_acl_id = aws_network_acl.public.id
+}
+
+resource "aws_network_acl" "private_compute" {
+  vpc_id = aws_vpc.main.id
+
+  # Allow inbound traffic from public subnets
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = aws_subnet.public_subnet_a.cidr_block
+    from_port  = 443
+    to_port    = 443
+  }
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = aws_subnet.public_subnet_b.cidr_block
+    from_port  = 443
+    to_port    = 443
+  }
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = aws_subnet.public_subnet_c.cidr_block
+    from_port  = 443
+    to_port    = 443
+  }
+
+  # Allow outbound traffic to private DB subnets
+  egress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+}
+
+resource "aws_network_acl_association" "private_compute_a" {
+  subnet_id     = aws_subnet.private_compute_subnet_a.id
+  network_acl_id = aws_network_acl.private_compute.id
+}
+
+resource "aws_network_acl_association" "private_compute_b" {
+  subnet_id     = aws_subnet.private_compute_subnet_b.id
+  network_acl_id = aws_network_acl.private_compute.id
+}
+
+resource "aws_network_acl_association" "private_compute_c" {
+  subnet_id     = aws_subnet.private_compute_subnet_c.id
+  network_acl_id = aws_network_acl.private_compute.id
+}
 
 resource "aws_network_acl" "private_db" {
   vpc_id = aws_vpc.main.id
