@@ -29,6 +29,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 }
 
 # Manage lifecycle of objects
+# filter:
+# Specifies a filter to limit the scope of the rule.
+# The prefix field is set to an empty string "", meaning the rule applies to all objects in the bucket.
+
+# transition:
+# Defines how and when to transition objects to a different storage class.
+# In this example, objects will be transitioned to the GLACIER storage class after 30 days.
+
+# expiration:
+# Specifies when the objects should expire (i.e., be permanently deleted).
+# In this example, objects will be deleted 365 days after their creation.
 resource "aws_s3_bucket_lifecycle_configuration" "example" {
   bucket = aws_s3_bucket.example.bucket
 
