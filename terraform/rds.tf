@@ -7,7 +7,6 @@
 #  }
 #
 
-
 resource "aws_db_subnet_group" "main" {
   name       = "aurora-db-subnet-group"
   subnet_ids = [aws_subnet.private_db_subnet.id]
@@ -99,4 +98,31 @@ resource "aws_backup_selection" "example" {
     "arn:aws:rds:us-east-1:123456789012:db:aurora-instance-0",
     "arn:aws:rds:us-east-1:123456789012:db:aurora-instance-1",
   ]
+}
+
+# Define the KMS key
+resource "aws_kms_key" "example" {
+  description             = "Example KMS key"
+  key_usage               = "ENCRYPT_DECRYPT"
+  customer_master_key_spec = "SYMMETRIC_DEFAULT"
+
+  tags = {
+    Name = "${local.organisation}-kms-key"
+  }
+}
+
+# Optionally define an alias for the KMS key
+resource "aws_kms_alias" "example" {
+  name          = "alias/example-kms-key"
+  target_key_id = aws_kms_key.example.id
+}
+
+# Output the KMS key ID
+output "kms_key_id" {
+  value = aws_kms_key.example.id
+}
+
+# Output the KMS key ARN
+output "kms_key_arn" {
+  value = aws_kms_key.example.arn
 }
