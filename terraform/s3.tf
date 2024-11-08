@@ -35,6 +35,33 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
   }
 }
 
+# Applying bucket policy: Denies requests that are not using secure transport (HTTPS).
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.secure_bucket.id
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::my-secure-bucket",
+        "arn:aws:s3:::my-secure-bucket/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
 # Manage lifecycle of objects
 # filter:
 # Specifies a filter to limit the scope of the rule.
@@ -48,7 +75,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 # Specifies when the objects should expire (i.e., be permanently deleted).
 # In this example, objects will be deleted 365 days after their creation.
 resource "aws_s3_bucket_lifecycle_configuration" "example" {
-  bucket = aws_s3_bucket.example.bucket
+  bucket = aws_s3_bucket.secure_bucket.bucket
 
   rule {
     id     = "transition-to-glacier"
