@@ -15,7 +15,7 @@ resource "aws_lb" "web_alb" {
   enable_deletion_protection = false
 
   tags = {
-    Name = "WebALB"
+    Name = "${local.organisation}-web-alb"
   }
 }
 
@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "web_tg" {
   }
 
   tags = {
-    Name = "WebTG"
+    Name = "${local.organisation}-web-tg"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_lb_listener" "web_listener_https" {
   }
 
   tags = {
-    Name = "WebListenerHTTPS"
+    Name = "${local.organisation}-WebListenerHTTPS"
   }
 }
 
@@ -71,7 +71,3 @@ resource "aws_lb_listener" "web_listener_https" {
 #     values = ["/*"]
 #   }
 # }
-
-output "alb_dns_name" {
-  value = aws_lb.web_alb.dns_name
-}

@@ -56,8 +56,3 @@ resource "aws_autoscaling_group" "web" {
     create_before_destroy = true
   }
 }
-
-# Output the Auto Scaling Group Name
-output "autoscaling_group_name" {
-  value = aws_autoscaling_group.web.name
-}
