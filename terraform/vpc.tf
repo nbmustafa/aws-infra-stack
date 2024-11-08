@@ -9,14 +9,14 @@ resource "aws_subnet" "public_subnet_a" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/26"
   map_public_ip_on_launch = true
-  availability_zone = "eu-central-1a"
+  availability_zone = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "public_subnet_b" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.64/26"
   map_public_ip_on_launch = true
-  availability_zone = "eu-central-1b"
+  availability_zone = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "public_subnet_c" {
@@ -30,38 +30,38 @@ resource "aws_subnet" "public_subnet_c" {
 resource "aws_subnet" "private_compute_subnet_a" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.2.0/26"
-  availability_zone = "eu-central-1a"
+  availability_zone = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "private_compute_subnet_b" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.2.64/26"
-  availability_zone = "eu-central-1b"
+  availability_zone = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "private_compute_subnet_c" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.2.128/26"
-  availability_zone = "eu-central-1c"
+  availability_zone = "${data.aws_region.current.name}c"
 }
 
 # Private DB Subnets
 resource "aws_subnet" "private_db_subnet_a" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.3.0/26"
-  availability_zone = "eu-central-1a"
+  availability_zone = "${data.aws_region.current.name}a"
 }
 
 resource "aws_subnet" "private_db_subnet_b" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.3.64/26"
-  availability_zone = "eu-central-1b"
+  availability_zone = "${data.aws_region.current.name}b"
 }
 
 resource "aws_subnet" "private_db_subnet_c" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.3.128/26"
-  availability_zone = "eu-central-1c"
+  availability_zone = "${data.aws_region.current.name}c"
 }
 
 # IGW and Routing tables
