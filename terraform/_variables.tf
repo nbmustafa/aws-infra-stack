@@ -26,8 +26,8 @@ variable "db_engine_version" {
   default     = "5.7.mysql_aurora.2.08.1"
 }
 
-variable "db_name" {
-  description = "Database name"
-  type        = string
-  default     = "mydatabase"
-}
+# variable "db_name" {
+#   description = "Database name"
+#   type        = string
+#   default     = "mydatabase"
+# }

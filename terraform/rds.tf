@@ -8,7 +8,7 @@
 #
 
 resource "aws_db_subnet_group" "main" {
-  name       = "aurora-db-subnet-group"
+  name       = "${local.organisation}-aurora-db-subnet-group"
   subnet_ids = [aws_subnet.private_db_subnet.id]
 
   tags = {
@@ -18,7 +18,7 @@ resource "aws_db_subnet_group" "main" {
 
 ## Retrive secrets from AWS secret managers:
 data "aws_secretsmanager_secret" "db_credentials" {
-  name = "aurora-db-credentials"
+  name = "${local.organisation}-aurora-db-credentials"
 }
 
 data "aws_secretsmanager_secret_version" "db_credentials_version" {
@@ -38,13 +38,13 @@ resource "aws_rds_cluster" "aurora" {
   engine_version          = var.db_engine_version
   master_username         = local.db_username
   master_password         = local.db_password
-  database_name           = var.db_name
+  database_name           = "${local.organisation}-db"
   vpc_security_group_ids  = [aws_security_group.aurora_sg.id]
   db_subnet_group_name    = aws_db_subnet_group.main.name
   skip_final_snapshot     = true
 
   tags = {
-    Name        = "AuroraCluster"
+    Name        = "${local.organisation}-AuroraCluster"
     Environment = "production"
     Backup      = "true"
   }
@@ -67,16 +67,16 @@ resource "aws_rds_cluster_instance" "aurora_instances" {
 
 #### Create Backup Vault
 resource "aws_backup_vault" "example" {
-  name        = "my-backup-vault"
-  kms_key_arn = "arn:aws:kms:us-east-1:123456789012:key/your-kms-key-id" # Optional
+  name        = "${local.organisation}-backup-vault"
+  kms_key_arn = aws_kms_key.main.id # Optional
 }
 
 #### Create Backup Plan
 resource "aws_backup_plan" "example" {
-  name = "my-backup-plan"
+  name = "${local.organisation}-backup-plan"
 
   rule {
-    rule_name         = "my-backup-plan-rule"
+    rule_name         = "${local.organisation}-backup-plan-rule"
     target_vault_name = aws_backup_vault.example.name
     schedule          = "cron(0 12 * * ? *)"
     start_window      = 360
@@ -91,7 +91,7 @@ resource "aws_backup_plan" "example" {
 #### Assign Resource to Backup Plan
 resource "aws_backup_selection" "example" {
   iam_role_arn = "arn:aws:iam::123456789012:role/AWSBackupDefaultServiceRole"
-  name         = "aurora-backup-selection"
+  name         = "${local.organisation}-aurora-backup-selection"
   plan_id      = aws_backup_plan.example.id
 
   resources = [
@@ -101,7 +101,7 @@ resource "aws_backup_selection" "example" {
 }
 
 # Define the KMS key
-resource "aws_kms_key" "example" {
+resource "aws_kms_key" "main" {
   description             = "Example KMS key"
   key_usage               = "ENCRYPT_DECRYPT"
   customer_master_key_spec = "SYMMETRIC_DEFAULT"
@@ -112,17 +112,17 @@ resource "aws_kms_key" "example" {
 }
 
 # Optionally define an alias for the KMS key
-resource "aws_kms_alias" "example" {
-  name          = "alias/example-kms-key"
-  target_key_id = aws_kms_key.example.id
+resource "aws_kms_alias" "main" {
+  name          = "alias/${local.organisation}-kms-key"
+  target_key_id = aws_kms_key.main.id
 }
 
 # Output the KMS key ID
 output "kms_key_id" {
-  value = aws_kms_key.example.id
+  value = aws_kms_key.main.id
 }
 
 # Output the KMS key ARN
 output "kms_key_arn" {
-  value = aws_kms_key.example.arn
+  value = aws_kms_key.main.arn
 }

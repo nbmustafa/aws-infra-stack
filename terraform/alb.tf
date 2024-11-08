@@ -1,9 +1,15 @@
 # Create ssl cert from acm for your hostname
 resource "aws_lb" "web_alb" {
-  name               = "web-alb"
+  name               = "${local.organisation}-web-alb"
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.web_sg.id]
-  subnets            = [aws_subnet.public_subnet.id]
+  security_groups    = [aws_security_group.web_alb_sg.id]
+  
+  # Include all three public subnets
+  subnets = [
+    aws_subnet.public_subnet_a.id,
+    aws_subnet.public_subnet_b.id,
+    aws_subnet.public_subnet_c.id
+  ]
 
   enable_deletion_protection = false
 
@@ -12,8 +18,9 @@ resource "aws_lb" "web_alb" {
   }
 }
 
+
 resource "aws_lb_target_group" "web_tg" {
-  name     = "web-tg"
+  name     = "${local.organisation}-web-tg"
   port     = 443
   protocol = "HTTPS"
   target_type = "ip"

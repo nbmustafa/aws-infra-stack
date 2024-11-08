@@ -7,7 +7,7 @@
 
 # Creating S3 bucket
 resource "aws_s3_bucket" "secure_bucket" {
-  bucket = "my-bucket-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
+  bucket = "${local.organisation}-bucket1-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
 
   tags = {
     Name        = "My Secure Bucket"
