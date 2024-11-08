@@ -202,7 +202,7 @@ resource "aws_network_acl_rule" "ingress_corporate" {
   for_each = { for i, cidr in local.cloudflare_ip_range : i => cidr }
 
   network_acl_id = aws_network_acl.public.id
-  rule_number    = 100 + each.key * 10
+  rule_number    = 1000 + each.key * 10
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -214,7 +214,7 @@ resource "aws_network_acl_rule" "ingress_corporate" {
 # Define egress rules if needed
 resource "aws_network_acl_rule" "egress_all" {
   network_acl_id = aws_network_acl.public.id
-  rule_number    = 400
+  rule_number    = 2000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = true
@@ -240,7 +240,7 @@ resource "aws_network_acl_rule" "ssh_ingress_from_corporate" {
   for_each = { for i, cidr in local.corporate_ip_range : i => cidr }
 
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 100 + each.key * 10
+  rule_number    = 1000 + each.key * 10
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -253,7 +253,7 @@ resource "aws_network_acl_rule" "https_from_ingress_corporate" {
   for_each = { for i, cidr in local.corporate_ip_range : i => cidr }
 
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 200 + each.key * 10
+  rule_number    = 2000 + each.key * 10
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -265,7 +265,7 @@ resource "aws_network_acl_rule" "https_from_ingress_corporate" {
 # Additional NACL ingress rules for public subnets
 resource "aws_network_acl_rule" "ingress_from_public_a" {
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 300
+  rule_number    = 3000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -276,7 +276,7 @@ resource "aws_network_acl_rule" "ingress_from_public_a" {
 
 resource "aws_network_acl_rule" "ingress_from_public_b" {
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 310
+  rule_number    = 3100
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -287,7 +287,7 @@ resource "aws_network_acl_rule" "ingress_from_public_b" {
 
 resource "aws_network_acl_rule" "ingress_from_public_c" {
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 320
+  rule_number    = 3200
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -299,7 +299,7 @@ resource "aws_network_acl_rule" "ingress_from_public_c" {
 # Define egress rules
 resource "aws_network_acl_rule" "egress_all" {
   network_acl_id = aws_network_acl.private_compute.id
-  rule_number    = 400
+  rule_number    = 4000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = true
@@ -323,7 +323,7 @@ resource "aws_network_acl" "private_db" {
 # Additional NACL ingress rules for public subnets
 resource "aws_network_acl_rule" "ingress_db_a" {
   network_acl_id = aws_network_acl.private_db.id
-  rule_number    = 300
+  rule_number    = 1000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -334,7 +334,7 @@ resource "aws_network_acl_rule" "ingress_db_a" {
 
 resource "aws_network_acl_rule" "ingress_db_b" {
   network_acl_id = aws_network_acl.private_db.id
-  rule_number    = 310
+  rule_number    = 2000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -345,7 +345,7 @@ resource "aws_network_acl_rule" "ingress_db_b" {
 
 resource "aws_network_acl_rule" "ingress_db_c" {
   network_acl_id = aws_network_acl.private_db.id
-  rule_number    = 320
+  rule_number    = 3000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = false
@@ -357,7 +357,7 @@ resource "aws_network_acl_rule" "ingress_db_c" {
 # Define egress rules if needed
 resource "aws_network_acl_rule" "egress_all" {
   network_acl_id = aws_network_acl.private_db.id
-  rule_number    = 400
+  rule_number    = 4000
   protocol       = "tcp"
   rule_action    = "allow"
   egress         = true
