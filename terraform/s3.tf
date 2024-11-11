@@ -16,7 +16,7 @@ resource "aws_s3_bucket" "secure_bucket" {
 }
 
 # Block public access
-resource "aws_s3_public_access_block" "secure_bucket" {
+resource "aws_s3_bucket_public_access_block" "secure_bucket" {
   bucket = aws_s3_bucket.secure_bucket.id
 
   block_public_acls       = true
