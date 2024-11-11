@@ -30,7 +30,7 @@ resource "aws_s3_bucket_versioning" "example" {
   bucket = aws_s3_bucket.secure_bucket.bucket
 
   versioning_configuration {
-    status = "Enabled"
+    status     = "Enabled"
     mfa_delete = "Enabled" # Require MFA for delete operations
   }
 }
