@@ -212,7 +212,7 @@ resource "aws_network_acl_rule" "ingress_corporate" {
 }
 
 # Define egress rules if needed
-resource "aws_network_acl_rule" "egress_all" {
+resource "aws_network_acl_rule" "egress_all_from_public" {
   network_acl_id = aws_network_acl.public.id
   rule_number    = 2000
   protocol       = "tcp"
@@ -297,7 +297,7 @@ resource "aws_network_acl_rule" "ingress_from_public_c" {
 }
 
 # Define egress rules
-resource "aws_network_acl_rule" "egress_all" {
+resource "aws_network_acl_rule" "egress_all_from_compute" {
   network_acl_id = aws_network_acl.private_compute.id
   rule_number    = 4000
   protocol       = "tcp"
@@ -355,7 +355,7 @@ resource "aws_network_acl_rule" "ingress_db_c" {
 }
 
 # Define egress rules if needed
-resource "aws_network_acl_rule" "egress_all" {
+resource "aws_network_acl_rule" "egress_all_from_db" {
   network_acl_id = aws_network_acl.private_db.id
   rule_number    = 4000
   protocol       = "tcp"
