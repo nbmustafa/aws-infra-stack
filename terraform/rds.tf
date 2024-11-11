@@ -8,7 +8,7 @@
 #
 
 resource "aws_db_subnet_group" "main" {
-  name       = "${local.organisation}-aurora-db-subnet-group-a"
+  name = "${local.organisation}-aurora-db-subnet-group-a"
   subnet_ids = [
     aws_subnet.private_db_subnet_a.id,
     aws_subnet.private_db_subnet_b.id,

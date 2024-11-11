@@ -15,12 +15,23 @@ resource "aws_s3_bucket" "secure_bucket" {
   }
 }
 
+# Block public access
+resource "aws_s3_public_access_block" "secure_bucket" {
+  bucket = aws_s3_bucket.secure_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 # Enable versioning on the S3 bucket
 resource "aws_s3_bucket_versioning" "example" {
   bucket = aws_s3_bucket.secure_bucket.bucket
 
   versioning_configuration {
     status = "Enabled"
+    mfa_delete = "Enabled" # Require MFA for delete operations
   }
 }
 
@@ -48,8 +59,8 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
       "Principal": "*",
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::my-secure-bucket",
-        "arn:aws:s3:::my-secure-bucket/*"
+        "arn:aws:s3:::${aws_s3_bucket.secure_bucket.bucket}", 
+        "arn:aws:s3:::${aws_s3_bucket.secure_bucket.bucket}/*"
       ],
       "Condition": {
         "Bool": {
