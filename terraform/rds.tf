@@ -43,7 +43,7 @@ resource "aws_rds_cluster" "aurora" {
   master_username        = local.db_username
   master_password        = local.db_password
   database_name          = "${local.organisation}-db"
-  vpc_security_group_ids = [aws_security_group.aurora_sg.id]
+  vpc_security_group_ids = [aws_security_group.private_db_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.main.name
   skip_final_snapshot    = true
 
