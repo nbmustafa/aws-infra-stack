@@ -4,16 +4,6 @@ variable "ssl_cert_arn" {
   default     = ""
 }
 
-variable "kms_key_arn" {
-  description = "KMS key ARN for backup encryption"
-  type        = string
-}
-
-variable "iam_backup_role_arn" {
-  description = "IAM role ARN for AWS Backup"
-  type        = string
-}
-
 variable "db_engine_version" {
   description = "Engine version for Aurora MySQL"
   type        = string
