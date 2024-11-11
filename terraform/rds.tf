@@ -7,9 +7,27 @@
 #  }
 #
 
-resource "aws_db_subnet_group" "main" {
-  name       = "${local.organisation}-aurora-db-subnet-group"
-  subnet_ids = [aws_subnet.private_db_subnet.id]
+resource "aws_db_subnet_group" "db_subnet_group_a" {
+  name       = "${local.organisation}-aurora-db-subnet-group-a"
+  subnet_ids = [aws_subnet.private_db_subnet_a.id]
+
+  tags = {
+    Name = "AuroraDBSubnetGroup"
+  }
+}
+
+resource "aws_db_subnet_group" "db_subnet_group_b" {
+  name       = "${local.organisation}-aurora-db-subnet-group-b"
+  subnet_ids = [aws_subnet.private_db_subnet_b.id]
+
+  tags = {
+    Name = "AuroraDBSubnetGroup"
+  }
+}
+
+resource "aws_db_subnet_group" "db_subnet_group_c" {
+  name       = "${local.organisation}-aurora-db-subnet-group-c"
+  subnet_ids = [aws_subnet.private_db_subnet_c.id]
 
   tags = {
     Name = "AuroraDBSubnetGroup"
