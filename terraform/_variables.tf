@@ -4,12 +4,6 @@ variable "ssl_cert_arn" {
   default     = ""
 }
 
-
-variable "allowed_cidr" {
-  description = "CIDR block allowed for inbound RDS connections (e.g., office IP)"
-  type        = string
-}
-
 variable "kms_key_arn" {
   description = "KMS key ARN for backup encryption"
   type        = string
